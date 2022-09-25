@@ -13,13 +13,8 @@
 
     "content_scripts": [
         {
-<<<<<<< HEAD
-            "matches": ["https://online.ntnu.no/events/*"],
-            "js": ["test.js"]
-=======
           "matches": ["https://online.ntnu.no/events/*"],
           "js": ["addEvent.js"]
->>>>>>> buttonConnection
         }
     ]
 
