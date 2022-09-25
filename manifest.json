@@ -6,7 +6,19 @@
     "action": {
         "default_popup": "popup.html"
     },
+
     "background": {
-        "service_worker": "background.js"
-    }
+        "service_worker": "background.js",
+        "permission": [
+            "tabs",
+            "activeTab"
+        ]
+    },
+    "content_scripts": [
+        {
+          "matches": ["https://online.ntnu.no/events/*"],
+          "js": ["test.js"]
+        }
+      ]
+    
 }
