@@ -4,10 +4,8 @@
     "version": "0.1",
     "manifest_version": 3,
     "action": {
-        "default_title": "Test"
-    },
-    "background": {
-        "service_worker": "background.js"
+        "default_title": "Test",
+        "default_popup": "popup.html"
     },
     "permissions": [
         "identity",
