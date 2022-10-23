@@ -1,14 +1,14 @@
-function onGAPILoad() {
-  gapi.client.init({
-    // Don't pass client nor scope as these will init auth2, which we don't want
-    apiKey: API_KEY,
-    discoveryDocs: DISCOVERY_DOCS,
-  }).then(function () {
-    console.log('gapi initialized')
-  }, function(error) {
-    console.log('error', error)
-  });
-}
+// function onGAPILoad() {
+//   gapi.client.init({
+//     // Don't pass client nor scope as these will init auth2, which we don't want
+//     apiKey: API_KEY,
+//     discoveryDocs: DISCOVERY_DOCS,
+//   }).then(function () {
+//     console.log('gapi initialized')
+//   }, function(error) {
+//     console.log('error', error)
+//   });
+// }
 
 
 window.onload = function() {
@@ -30,10 +30,10 @@ window.onload = function() {
           };
         
           fetch('https://www.googleapis.com/calendar/v3/calendars?key=AIzaSyCL3vj18BOFVjgfPjHUEMxYfcxqwKZOpss', init)
-          .then((response) => response.json()) // Transform the data into json
-          .then(function(data) {
-              console.log(data);
-            })
+          .then(function(data) {console.log(data)}) // Transform the data into json
+          // .then(function(data) {
+          //     console.log(data);
+            // })
       });
     });
   };
