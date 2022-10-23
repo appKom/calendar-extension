@@ -16,20 +16,18 @@ window.onload = function() {
       chrome.identity.getAuthToken({interactive: true}, function(token) {
         console.log(token);
         var init = { 
-            'method' : 'INSERT',
+            'method' : 'POST',
             'async'  : true,
             'headers': {
               'Authorization' : 'Bearer ' + token,
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
-            'contentType': 'json',
-            "body": {
-              "summary": "test"
-            }
+            // 'contentType': 'json',
+            'body': "{'summary': 'Extension-test'}"
           };
         
-          fetch('https://www.googleapis.com/calendar/v3/calendars?key=AIzaSyCL3vj18BOFVjgfPjHUEMxYfcxqwKZOpss', init)
+          fetch('https://www.googleapis.com/calendar/v3/calendars?alt=json&key=AIzaSyCL3vj18BOFVjgfPjHUEMxYfcxqwKZOpss', init)
           .then(function(data) {console.log(data)}) // Transform the data into json
           // .then(function(data) {
           //     console.log(data);
