@@ -6,19 +6,6 @@ async function setCalendarIdToCookie(token) {
   document.cookie = "calendarId=" + calendarId + "; expires=Thu, 18 Dec 2999 12:00:00 UTC; path=/";
 }
 
-
-window.onload = function() { 
-    document.getElementById("gammel-knapp").addEventListener('click', function() {
-      chrome.identity.getAuthToken({interactive: true}, (token) => {
-        setCalendarIdToCookie(token)
-    });
-
-    document.getElementById("cookie-checker").addEventListener("click", () => {
-      console.log(document.cookie);
-    })
-  });
-}
-
 async function addNewSecondaryCalendar(token) {
   // Returnerer id-en til opprettet kalender.
   var init = { 
@@ -36,19 +23,70 @@ async function addNewSecondaryCalendar(token) {
   response = await fetch('https://www.googleapis.com/calendar/v3/calendars?alt=json&key=AIzaSyCL3vj18BOFVjgfPjHUEMxYfcxqwKZOpss', init)
   data = await response.json()
   return data
-  // .then((response) => response.json())
-  // .then(function(data) {
-  //   console.log(data)
-  //   // return data
-  //   promise = new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       resolve(data)
-  //     }, 2000)
-      
-  //   }) /* Returnerer id-en til ny-opprettet kalender */
-  //   console.log(promise.then((test) => {
-  //     return test
-  //   }))
-  //   return promise
-  // })
+}
+
+function getCalendarIdFromCookie() {
+  //! NB: Denne funksjonen tar utgangspunkt i at vi ikke har lagret noe annet i cookie
+  // TODO: Gjør mer dynamisk
+  let cookie = decodeURIComponent(document.cookie)
+  console.log(cookie)
+  id = cookie.split("=")[1]
+  return id
+
+}
+
+window.onload = function() {
+    document.getElementById("gammel-knapp").addEventListener('click', function() {
+
+        online_calendar_id = "c_rsnpvik3adgtmjmphiv9jba8sk@group.calendar.google.com" //! TEMPORARY
+        online_calendar_exists = false;
+
+        if (getCalendarIdFromCookie() !== undefined) {
+          online_calendar_id = getCalendarIdFromCookie()
+          online_calendar_exists = true
+        }
+        chrome.identity.getAuthToken({interactive: true}, function(token) { // GET
+            console.log(token);
+
+            var init = {
+                'method' : 'GET',
+                'async'  : true,
+                'headers': {
+                    'Authorization' : 'Bearer ' + token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                'contentType': 'json'
+            };
+
+            fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', init)
+            .then((response) => response.json()) // Transform the data into json
+            .then(function(data) {
+                console.log(data);                
+
+                if (check_if_calendar_exists(data, online_calendar_id)) {
+                    console.log("Calendar already exists")
+                } else {
+                    console.log("Calendar does not exist")
+                }
+
+                online_calendar_exists = check_if_calendar_exists(data, online_calendar_id)
+            })
+
+            if (!online_calendar_exists) { // CREATE NEW CALENDAR
+              setCalendarIdToCookie(token)  // Lager også en ny kalender, bør renames.
+            }
+        });
+
+    });
+};
+
+function check_if_calendar_exists(data, calendar_id) {
+    for (var i = 0; i < data.items.length; i++) {
+        console.log(data.items[i].id)
+        if (data.items[i].id == calendar_id) {
+            return true;
+        }
+    }
+    return false; 
 }
