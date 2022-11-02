@@ -1,9 +1,9 @@
-async function setCalendarIdToCookie(token) {
+async function addCalendarAndStoreCalendarId(token) {
   console.log(token)
   data = await addNewSecondaryCalendar(token)
   calendarId = data.id
   console.log("Fra autorisering, id: " + calendarId)
-  document.cookie = "calendarId=" + calendarId + "; expires=Thu, 18 Dec 2999 12:00:00 UTC; path=/";
+  localStorage.setItem("online_calendar_id", calendarId)
 }
 
 async function addNewSecondaryCalendar(token) {
@@ -25,26 +25,21 @@ async function addNewSecondaryCalendar(token) {
   return data
 }
 
-function getCalendarIdFromCookie() {
-  //! NB: Denne funksjonen tar utgangspunkt i at vi ikke har lagret noe annet i cookie
-  // TODO: Gjør mer dynamisk
-  let cookie = decodeURIComponent(document.cookie)
-  console.log(cookie)
-  id = cookie.split("=")[1]
-  return id
+// function getCalendarIdFromCookie() {
+//   //! NB: Denne funksjonen tar utgangspunkt i at vi ikke har lagret noe annet i cookie
+//   // TODO: Gjør mer dynamisk
+//   let cookie = decodeURIComponent(document.cookie)
+//   console.log(cookie)
+//   id = cookie.split("=")[1]
+//   return id
 
-}
+// }
 
 window.onload = function() {
     document.getElementById("gammel-knapp").addEventListener('click', function() {
 
-        online_calendar_id = "c_rsnpvik3adgtmjmphiv9jba8sk@group.calendar.google.com" //! TEMPORARY
-        online_calendar_exists = false;
-
-        if (getCalendarIdFromCookie() !== undefined) {
-          online_calendar_id = getCalendarIdFromCookie()
-          online_calendar_exists = true
-        }
+        online_calendar_id = localStorage.getItem("online_calendar_id")
+        
         chrome.identity.getAuthToken({interactive: true}, function(token) { // GET
             console.log(token);
 
@@ -63,23 +58,24 @@ window.onload = function() {
             .then((response) => response.json()) // Transform the data into json
             .then(function(data) {
                 console.log(data);                
+                
+                online_calendar_exists = false
+                if (online_calendar_id) {
+                  if (check_if_calendar_exists(data, online_calendar_id)) {
+                      console.log("Calendar already exists")
+                      online_calendar_exists = true
+                  } else {
+                      console.log("Calendar does not exist")
+                  }
+                } else {console.log("No calendarID in localStorage")}
 
-                if (check_if_calendar_exists(data, online_calendar_id)) {
-                    console.log("Calendar already exists")
-                } else {
-                    console.log("Calendar does not exist")
-                }
-
-                online_calendar_exists = check_if_calendar_exists(data, online_calendar_id)
-            })
-
-            if (!online_calendar_exists) { // CREATE NEW CALENDAR
-              setCalendarIdToCookie(token)  // Lager også en ny kalender, bør renames.
+                if (!online_calendar_exists) { // CREATE NEW CALENDAR
+                  addCalendarAndStoreCalendarId(token)
             }
         });
-
     });
-};
+  })
+}
 
 function check_if_calendar_exists(data, calendar_id) {
     for (var i = 0; i < data.items.length; i++) {
