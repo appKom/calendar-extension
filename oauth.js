@@ -1,5 +1,5 @@
 async function setCalendarIdToCookie(token) {
-  console.log(token)
+  console.log("token: " + token)
   data = await addNewSecondaryCalendar(token)
   calendarId = data.id
   console.log("Fra autorisering, id: " + calendarId)
@@ -8,6 +8,7 @@ async function setCalendarIdToCookie(token) {
 
 async function addNewSecondaryCalendar(token) {
   // Returnerer id-en til opprettet kalender.
+  console.log("Adding new secondary calendar")
   var init = { 
     'method' : 'POST',
     'async'  : true,
@@ -29,7 +30,7 @@ function getCalendarIdFromCookie() {
   //! NB: Denne funksjonen tar utgangspunkt i at vi ikke har lagret noe annet i cookie
   // TODO: Gjør mer dynamisk
   let cookie = decodeURIComponent(document.cookie)
-  console.log(cookie)
+  console.log("cookie: " + cookie)
   id = cookie.split("=")[1]
   return id
 
@@ -45,8 +46,9 @@ window.onload = function() {
           online_calendar_id = getCalendarIdFromCookie()
           online_calendar_exists = true
         }
+
         chrome.identity.getAuthToken({interactive: true}, function(token) { // GET
-            console.log(token);
+            console.log("token: " + token);
 
             var init = {
                 'method' : 'GET',
@@ -77,7 +79,6 @@ window.onload = function() {
               setCalendarIdToCookie(token)  // Lager også en ny kalender, bør renames.
             }
         });
-
     });
 };
 
