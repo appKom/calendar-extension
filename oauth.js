@@ -1,3 +1,6 @@
+API_KEY = "AIzaSyCL3vj18BOFVjgfPjHUEMxYfcxqwKZOpss"
+
+
 async function setCalendarIdToCookie(token) {
   console.log("token: " + token)
   data = await addNewSecondaryCalendar(token)
@@ -21,7 +24,7 @@ async function addNewSecondaryCalendar(token) {
     'body': "{'summary': 'Extension-test'}"
   };
 
-  response = await fetch('https://www.googleapis.com/calendar/v3/calendars?alt=json&key=AIzaSyCL3vj18BOFVjgfPjHUEMxYfcxqwKZOpss', init)
+  response = await fetch('https://www.googleapis.com/calendar/v3/calendars?alt=json&key=' + API_KEY, init)
   data = await response.json()
   return data
 }
