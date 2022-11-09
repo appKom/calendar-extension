@@ -62,7 +62,7 @@ window.onload = function() {
             fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', init)
             .then((response) => response.json()) // Transform the data into json
             .then(function(data) {
-                console.log(data);                
+                console.log("data: " + data);                
 
                 if (check_if_calendar_exists(data, online_calendar_id)) {
                     console.log("Calendar already exists")
@@ -76,8 +76,7 @@ window.onload = function() {
             if (!online_calendar_exists) { // CREATE NEW CALENDAR
               setCalendarIdToCookie(token)  // Lager også en ny kalender, bør renames.
             }
-        });
-
+          });
     });
 };
 
@@ -89,4 +88,4 @@ function check_if_calendar_exists(data, calendar_id) {
         }
     }
     return false; 
-}
+};
