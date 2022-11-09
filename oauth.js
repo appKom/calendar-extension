@@ -72,9 +72,13 @@ window.onload = function() {
 
                 if (!online_calendar_exists) { // CREATE NEW CALENDAR
                   addCalendarAndStoreCalendarId(token)
-            }
-        });
-    });
+            
+                }
+        
+              });
+    
+              localStorage.setItem("user-token", token)
+      });
   })
 }
 
