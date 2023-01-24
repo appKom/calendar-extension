@@ -36,12 +36,12 @@ async function postEventInner(credentials) {
                 'Content-Type': 'application/json',
             },
             'body': `{
-                "end": {
-                    "dateTime": "2022-11-28T09:00:00-07:00",
-                    "timeZone": "America/Los_Angeles"
-                },
                 "start": {
                     "dateTime": "2022-11-28T09:00:00-08:00",
+                    "timeZone": "America/Los_Angeles"
+                },
+                "end": {
+                    "dateTime": "2022-11-28T09:00:00-09:00",
                     "timeZone": "America/Los_Angeles"
                 }
             }`
