@@ -1,51 +1,58 @@
-/* Ved å legge til lenken: https://online.ntnu.no/events/*  under
-"content_scripts" i manifest.json, kan vi bestemme spesefike 
-scripts og css-filer som skal kjøres ved følgende url.
-* betyr at filene vi legger til vil kjøres på alt som oppfyller 
-alt frem til stjernen og uansett hva som kommer etter. */
-
-// Her legger vi til en eventlistener på siden vi befinner oss på.
+/* Denne filen blir insertet når man går til en online-side.
+Brukes så for å posteEvent()*/
 
 async function postEvent(event) {
-    /* Sender request til extensionen (popup-en) og 
-    ber om API-key og user-token tilbake. 
-    Caller så postEventInner med riktige credentials */
+    /* Funksjon postEvent()
 
+    Resultat:
+    Legger til event til autentisert brukers kalender.
+    
+    Beskrivelse:
+    Ytre funksjon som fetcher riktige credentials (fra background.js) og deretter
+    caller PostEventInner med disse og eventet.*/
+
+    // Brukes for å sende request til background.js
     const extension_id = "elijkjhoojegfcnehlpgbkacplephicj"
 
+    // Sender requests til background.js etter credentials.
     chrome.runtime.sendMessage(
         extension_id,
         { request: "credentials" },
         async function (response) {
-            console.log("API_KEY i getCredentials: " + response.API_KEY)
-            console.log("token i getCredentials: " + response.token)
+            // Response er et objekt med verdiene API_KEY og token
             await postEventInner(response, event)
         }
     )
 }
 
 async function postEventInner(credentials, event) {
-    // Poster event til brukers online-kalender
+    /* Indre funksjon som blir callet fra postEvent() og gjør
+    selve POST-requesten til kalender-API-et.*/
+
     const API_KEY = credentials.API_KEY
     const token = credentials.token
 
-    /* HTTP-header for å poste event */
+    /* Statisk HTTP-header som brukes for å poste event */
     var init = {
-        'method': 'POST',
-        'async': true,
-        'headers': {
-            'Authorization': 'Bearer ' + token,
-            'Accept': 'application/json',
+        method: 'POST',
+        async: true,
+        headers: {
+            Authorization: 'Bearer ' + token,
+            Accept: 'application/json',
             'Content-Type': 'application/json',
         }
     }
 
-    init.body = event
+    // Gjør eventobjektet til en string som kan gjøres til body
     // Legger til selve eventet i bodyen til HTTP-requesten.
+    let eventString = JSON.stringify(event)
+    init.body = eventString
 
     chrome.storage.local.get(["online_calendar_id"], (result) => {
+        // Henter id-en til event-kalenderen fra storage
         const online_calendar_id = result.online_calendar_id
 
+        // Poster event til kalender-API
         fetch(
             "https://www.googleapis.com/calendar/v3/calendars/" +
             online_calendar_id +
@@ -55,31 +62,18 @@ async function postEventInner(credentials, event) {
         )
             .then((response) => response.json())
             .then((data) => {
+                // Respons fra event
                 console.log(data)
+
             })
     })
 }
 
 document.addEventListener("click", (e) => {
-    // her trekker vi ut teksten til knappen som ble klikket på,
-    // og sjekker om det samsvarer med den knappen vi ønsker å gi
-    // funksjonalitet til.
-    let testEvent = `{
-        "start": {
-            "dateTime": "2022-11-28T09:00:00-08:00",
-            "timeZone": "America/Los_Angeles"
-        },
-        "end": {
-            "dateTime": "2022-11-28T09:00:00-09:00",
-            "timeZone": "America/Los_Angeles"
-        }
-    }`
-
-    postEvent(testEvent);
-    if (e.target.innerText == "Meld meg på") {
-        console.log("Du har nå blitt meldt på! ");
-    }
-    else if (e.target.innerText == "Meld meg på venteliste") {
-        console.log("Du har nå blitt satt på venteliste. Du er nummer # i køen");
+    /* Hører etter alle klikk og sjekker om det er riktig
+    knapp ved å sjekke objektets innerText */
+    if (e.target.innerText == "Meld meg på"
+        || e.target.innerText == "Meld meg på venteliste") {
+        postEvent();
     }
 })
