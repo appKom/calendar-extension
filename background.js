@@ -96,7 +96,10 @@ async function doAuth() {
   })
 }
 
+
 chrome.runtime.onMessage.addListener(
+  /* Handler alle incoming messages fra andre filer som
+   */
   function (request, sender, sendResponse) {
     console.log(sender.tab ?
                 "from a content script:" + sender.tab.url :
