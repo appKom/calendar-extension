@@ -66,6 +66,26 @@ async function getEventData() {
   eventID = window.location.href.split("/")[4]
   let response = await fetch('https://old.online.ntnu.no/api/v1/events/' + eventID + '/')
   let data = await response.json()
+
+  let eventFull = data.max_capacity == data.number_of_seats_taken
+
+  if (eventFull){
+    return {
+      "summary": "Online | " + data.title,
+      "description": "OBS: Da du meldte deg på arrangementet, ble du lagt til i ventelista. \n---\n \n" + data.description,
+      "location": data.location,
+      "colorId": "9", // Blueberry: #3f51b5 | All colors: https://lukeboyle.com/blog/posts/google-calendar-api-color-id
+      "start": {
+        "dateTime": data.event_start,
+        "timeZone": "Europe/Oslo"
+      },
+      "end": {
+        "dateTime": data.event_end,
+        "timeZone": "Europe/Oslo"
+      }
+    }
+  }
+
   return {
     "summary": "Online | " + data.title,
     "description": data.description,
