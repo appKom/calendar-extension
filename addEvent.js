@@ -6,7 +6,7 @@ async function postEvent(event) {
 
     Resultat:
     Legger til event til autentisert brukers kalender.
-    
+
     Beskrivelse:
     Ytre funksjon som fetcher riktige credentials (fra background.js) og deretter
     caller PostEventInner med disse og eventet.*/
@@ -16,12 +16,12 @@ async function postEvent(event) {
 
     // Sender requests til background.js etter credentials.
     chrome.runtime.sendMessage(
-        extension_id,
-        { request: "credentials" },
-        async function (response) {
-            // Response er et objekt med verdiene API_KEY og token
-            await postEventInner(response, event)
-        }
+      extension_id,
+      { request: "credentials" },
+      async function (response) {
+        // Response er et objekt med verdiene API_KEY og token
+        await postEventInner(response, event)
+      }
     )
 }
 
@@ -50,21 +50,17 @@ async function postEventInner(credentials) {
       body: JSON.stringify(eventData),
     }
 
-    console.log("EventData: " + eventData)
-
-        // Poster event til kalender-API
+    // Poster event til kalender-API
     fetch(
-        "https://www.googleapis.com/calendar/v3/calendars/" +
-        online_calendar_id + "/events?key=" + API_KEY,
-        init
+      "https://www.googleapis.com/calendar/v3/calendars/" +
+      online_calendar_id + "/events?key=" + API_KEY,
+      init
     )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Test inni fetch")
-                // Respons fra event
-        console.log(data)
-
-      })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Test inni fetch")
+      console.log(data) // Respons fra event
+    })
   })
 }
 
@@ -76,44 +72,27 @@ async function getEventData() {
 
   let eventFull = data.max_capacity == data.number_of_seats_taken
 
-  if (eventFull){
-    return {
-      "summary": "Online | " + data.title,
-      "description": "OBS: Da du meldte deg på arrangementet, ble du lagt til i ventelista. \n---\n \n" + data.description,
-      "location": data.location,
-      "colorId": "9", // Blueberry: #3f51b5 | All colors: https://lukeboyle.com/blog/posts/google-calendar-api-color-id
-      "start": {
-        "dateTime": data.event_start,
-        "timeZone": "Europe/Oslo"
-      },
-      "end": {
-        "dateTime": data.event_end,
-        "timeZone": "Europe/Oslo"
-      }
-    }
-  }
-
   return {
-    "summary": "Online | " + data.title,
-    "description": data.description,
-    "location": data.location,
-    "colorId": "9", // Blueberry: #3f51b5 | All colors: https://lukeboyle.com/blog/posts/google-calendar-api-color-id
-    "start": {
-      "dateTime": data.event_start,
-      "timeZone": "Europe/Oslo"
+    summary: "Online | " + data.title,
+    description: eventFull ? "OBS: Da du meldte deg på arrangementet, ble du lagt til i ventelista. \n---\n \n": "" + data.description,
+    location: data.location,
+    colorId: "9", // Blueberry: #3f51b5 | All colors: https://lukeboyle.com/blog/posts/google-calendar-api-color-id
+    start: {
+      dateTime: data.event_start,
+      timeZone: "Europe/Oslo"
     },
-    "end": {
-      "dateTime": data.event_end,
-      "timeZone": "Europe/Oslo"
+    end: {
+      dateTime: data.event_end,
+      timeZone: "Europe/Oslo"
     }
   }
 }
 
 
 document.addEventListener("click", (e) => {
-    /* Hører etter alle klikk og sjekker om det er riktig
-    knapp ved å sjekke objektets innerText */
-    if (e.target.innerText == "Meld meg på"
-        || e.target.innerText == "Meld meg på venteliste") {
-        postEvent();
-    }})
+  /* Hører etter alle klikk og sjekker om det er riktig
+  knapp ved å sjekke objektets innerText */
+  if (e.target.innerText == "Meld meg på"
+    || e.target.innerText == "Meld meg på venteliste") {
+    postEvent();
+  }})
