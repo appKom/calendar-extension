@@ -11,7 +11,7 @@ async function postEvent(event) {
     Ytre funksjon som fetcher riktige credentials (fra background.js) og deretter
     caller PostEventInner med disse og eventet.*/
 
-    // Brukes for å sende request til background.js
+    // Brukes for å sende request til background.js'
     const extension_id = "elijkjhoojegfcnehlpgbkacplephicj"
 
     // Sender requests til background.js etter credentials.
