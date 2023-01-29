@@ -21,11 +21,12 @@ async function postEvent() {
   )
 }
 
+// Poster event til brukers online-kalender
 async function postEventInner(credentials) {
-  // Poster event til brukers online-kalender
-  // console.log("credentials i postEvent: " + credentials)
   const API_KEY = credentials.API_KEY
   const token = credentials.token
+
+  let eventData = await getEventData()
 
   chrome.storage.local.get(["online_calendar_id"], (result) => {
     const online_calendar_id = result.online_calendar_id
@@ -38,26 +39,15 @@ async function postEventInner(credentials) {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: `{
-                "start": {
-                    "dateTime": "2022-11-28T09:00:00-08:00",
-                    "timeZone": "America/Los_Angeles"
-                },
-                "end": {
-                    "dateTime": "2022-11-28T09:00:00-09:00",
-                    "timeZone": "America/Los_Angeles"
-                }
-            }`,
+      body: JSON.stringify(eventData),
     }
 
-    console.log("Test inni postEvent")
+    console.log("EventData: " + eventData)
 
     fetch(
-      "https://www.googleapis.com/calendar/v3/calendars/" +
-        online_calendar_id +
-        "/events?key=" +
-        API_KEY,
-      init
+        "https://www.googleapis.com/calendar/v3/calendars/" +
+        online_calendar_id + "/events?key=" + API_KEY,
+        init
     )
       .then((response) => response.json())
       .then((data) => {
@@ -67,8 +57,29 @@ async function postEventInner(credentials) {
   })
 }
 
+// Returnerer et objekt med eventData som skal plasseres i body i postEvent
+async function getEventData() {
+  eventID = window.location.href.split("/")[4]
+  let response = await fetch('https://old.online.ntnu.no/api/v1/events/' + eventID + '/')
+  let data = await response.json()
+  return {
+    "summary": "Online | " + data.title,
+    "description": data.description,
+    "location": data.location,
+    "colorId": "9", // Blueberry: #3f51b5 | All colors: https://lukeboyle.com/blog/posts/google-calendar-api-color-id
+    "start": {
+      "dateTime": data.event_start,
+      "timeZone": "Europe/Oslo"
+    },
+    "end": {
+      "dateTime": data.event_end,
+      "timeZone": "Europe/Oslo"
+    }
+  }
+}
+
+//? Eventlistener for påmeldingsknappen på online siden.
 document.addEventListener("click", (e) => {
-  // her trekker vi ut teksten til knappen som ble klikket på, og sjekker om det samsvarer med den knappen vi ønsker å gi funksjonalitet til.
   postEvent()
   if (e.target.innerText == "Meld meg på") {
     console.log("Du har nå blitt meldt på! ")
@@ -76,5 +87,3 @@ document.addEventListener("click", (e) => {
     console.log("Du har nå blitt satt på venteliste. Du er nummer # i køen")
   }
 })
-
-postEvent()

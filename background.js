@@ -1,5 +1,4 @@
-// NOTE: Vurder å bruke chrome.storage.sync
-// i stedet for chrome.storage.local
+// NOTE: Vurder å bruke chrome.storage.sync i stedet for chrome.storage.local
 
 async function addCalendarAndStoreCalendarId(token) {
   console.log("token: " + token)
@@ -10,8 +9,8 @@ async function addCalendarAndStoreCalendarId(token) {
   // localStorage.setItem("online_calendar_id", calendarId)
 }
 
+// Returnerer id-en til opprettet kalender.
 async function addNewSecondaryCalendar(token) {
-  // Returnerer id-en til opprettet kalender.
   console.log("Adding new secondary calendar")
   var init = {
     method: "POST",
@@ -43,6 +42,7 @@ function check_if_calendar_exists(data, calendar_id) {
   return false
 }
 
+// Lager en ny kalender for brukeren, og lagrer id-en til kalenderen i chrome.storage.local
 async function doAuth() {
   chrome.storage.local.get(["online_calendar_id"], (result) => {
     const online_calendar_id = result.online_calendar_id
@@ -96,11 +96,9 @@ async function doAuth() {
   })
 }
 
+//? Kjøres både når knappen i popup.html trykkes på,
+//? og når påmeldingsknappen på online trykkes på.
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  // console.log(sender.tab ?
-  //             "from a content script:" + sender.tab.url :
-  //             "from the extension")
-
   if (request.request === "oauth") {
     doAuth()
     return true
