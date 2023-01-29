@@ -1,5 +1,4 @@
-// NOTE: Vurder å bruke chrome.storage.sync
-// i stedet for chrome.storage.local
+// NOTE: Vurder å bruke chrome.storage.sync i stedet for chrome.storage.local
 
 async function addCalendarAndStoreCalendarId(token) {
   console.log("token: " + token)
@@ -10,6 +9,7 @@ async function addCalendarAndStoreCalendarId(token) {
   // localStorage.setItem("online_calendar_id", calendarId)
 }
 
+// Returnerer id-en til opprettet kalender.
 async function addNewSecondaryCalendar(token) {
   // Returnerer id-en til opprettet kalender basert på token.
   console.log("Adding new secondary calendar")
@@ -44,6 +44,7 @@ function check_if_calendar_exists(data, calendar_id) {
   return false
 }
 
+// Lager en ny kalender for brukeren, og lagrer id-en til kalenderen i chrome.storage.local
 async function doAuth() {
   /* Autentiserer bruker mot Google Calendar-API og får
   tilbake credentials (token) som lagres i storage.local for å */

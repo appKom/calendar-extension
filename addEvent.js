@@ -25,49 +25,70 @@ async function postEvent(event) {
     )
 }
 
-async function postEventInner(credentials, event) {
-    /* Indre funksjon som blir callet fra postEvent() og gjør
-    selve POST-requesten til kalender-API-et.*/
 
-    const API_KEY = credentials.API_KEY
-    const token = credentials.token
+async function postEventInner(credentials) {
+    /* Indre funksjon som blir callet fra postEvent() og gjør
+        selve POST-requesten til kalender-API-et.*/
+
+  const API_KEY = credentials.API_KEY
+  const token = credentials.token
+
+  let eventData = await getEventData()
+
+  chrome.storage.local.get(["online_calendar_id"], (result) => {
+    const online_calendar_id = result.online_calendar_id
 
     /* Statisk HTTP-header som brukes for å poste event */
     var init = {
-        method: 'POST',
-        async: true,
-        headers: {
-            Authorization: 'Bearer ' + token,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        }
+      method: "POST",
+      async: true,
+      headers: {
+        Authorization: "Bearer " + token,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventData),
     }
 
-    // Gjør eventobjektet til en string som kan gjøres til body
-    // Legger til selve eventet i bodyen til HTTP-requesten.
-    let eventString = JSON.stringify(event)
-    init.body = eventString
-
-    chrome.storage.local.get(["online_calendar_id"], (result) => {
-        // Henter id-en til event-kalenderen fra storage
-        const online_calendar_id = result.online_calendar_id
+    console.log("EventData: " + eventData)
 
         // Poster event til kalender-API
-        fetch(
-            "https://www.googleapis.com/calendar/v3/calendars/" +
-            online_calendar_id +
-            "/events?key=" +
-            API_KEY,
-            init
-        )
-            .then((response) => response.json())
-            .then((data) => {
+    fetch(
+        "https://www.googleapis.com/calendar/v3/calendars/" +
+        online_calendar_id + "/events?key=" + API_KEY,
+        init
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Test inni fetch")
                 // Respons fra event
-                console.log(data)
+        console.log(data)
 
-            })
-    })
+      })
+  })
 }
+
+// Returnerer et objekt med eventData som skal plasseres i body i postEvent
+async function getEventData() {
+  eventID = window.location.href.split("/")[4]
+  let response = await fetch('https://old.online.ntnu.no/api/v1/events/' + eventID + '/')
+  let data = await response.json()
+  return {
+    "summary": "Online | " + data.title,
+    "description": data.description,
+    "location": data.location,
+    "colorId": "9", // Blueberry: #3f51b5 | All colors: https://lukeboyle.com/blog/posts/google-calendar-api-color-id
+    "start": {
+      "dateTime": data.event_start,
+      "timeZone": "Europe/Oslo"
+    },
+    "end": {
+      "dateTime": data.event_end,
+      "timeZone": "Europe/Oslo"
+    }
+  }
+}
+
 
 document.addEventListener("click", (e) => {
     /* Hører etter alle klikk og sjekker om det er riktig
@@ -75,5 +96,4 @@ document.addEventListener("click", (e) => {
     if (e.target.innerText == "Meld meg på"
         || e.target.innerText == "Meld meg på venteliste") {
         postEvent();
-    }
-})
+    }})
