@@ -8,17 +8,18 @@ async function postEvent() {
     ber om API-key og user-token tilbake. 
     Caller så postEventInner med riktige credentials */
 
-    const extension_id = "elijkjhoojegfcnehlpgbkacplephicj"
+  const extension_id = "elijkjhoojegfcnehlpgbkacplephicj"
 
-    chrome.runtime.sendMessage(extension_id,
-        { request: "credentials" },
-        async function (response) {
-            console.log("API_KEY i getCredentials: " + response.API_KEY)
-            console.log("token i getCredentials: " + response.token)
-            await postEventInner(response)
-        })
+  chrome.runtime.sendMessage(
+    extension_id,
+    { request: "credentials" },
+    async function (response) {
+      console.log("API_KEY i getCredentials: " + response.API_KEY)
+      console.log("token i getCredentials: " + response.token)
+      await postEventInner(response)
+    }
+  )
 }
-
 
 async function postEventInner(credentials) {
     // Poster event til brukers online-kalender
@@ -46,17 +47,23 @@ async function postEventInner(credentials) {
                     "timeZone": "America/Los_Angeles"
                 }
             }`
-        }
+    }
 
-        console.log("Test inni postEvent")
+    console.log("Test inni postEvent")
 
-        fetch("https://www.googleapis.com/calendar/v3/calendars/" + online_calendar_id + "/events?key=" + API_KEY, init)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("Test inni fetch")
-                console.log(data)
-            })
-    })
+    fetch(
+      "https://www.googleapis.com/calendar/v3/calendars/" +
+        online_calendar_id +
+        "/events?key=" +
+        API_KEY,
+      init
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Test inni fetch")
+        console.log(data)
+      })
+  })
 }
 
 document.addEventListener("click", (e) => {
