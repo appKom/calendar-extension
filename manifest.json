@@ -5,11 +5,12 @@
     "manifest_version": 3,
     "action": {
         "default_title": "Test",
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_icon": "/media/Online_bla_o.png"
     },
     "background": {
         "service_worker": "background.js"
-    }, 
+    },
     "permissions": [
         "identity",
         "activeTab",
