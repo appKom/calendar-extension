@@ -1,24 +1,27 @@
-// Ved å legge til lenken: https://online.ntnu.no/events/*  under "content_scripts" i manifest.json, kan vi bestemme spesefike scripts og css-filer
-// som skal kjøres ved følgende url. * betyr at filene vi legger til vil kjøres på alt som oppfyller alt frem til stjernen og uansett hva som kommer etter.
+/* Ved å legge til lenken: https://online.ntnu.no/events/*  under
+"content_scripts" i manifest.json, kan vi bestemme spesefike 
+scripts og css-filer som skal kjøres ved følgende url.
+* betyr at filene vi legger til vil kjøres på alt som oppfyller 
+alt frem til stjernen og uansett hva som kommer etter. */
 
 // Her legger vi til en eventlistener på siden vi befinner oss på.
 
-async function postEvent() {
-  /* Sender request til extensionen (popup-en) og
-    ber om API-key og user-token tilbake.
-    Caller så postEvent med riktige credentials */
+async function postEvent(event) {
+    /* Sender request til extensionen (popup-en) og 
+    ber om API-key og user-token tilbake. 
+    Caller så postEventInner med riktige credentials */
 
-  const extension_id = "elijkjhoojegfcnehlpgbkacplephicj"
+    const extension_id = "elijkjhoojegfcnehlpgbkacplephicj"
 
-  chrome.runtime.sendMessage(
-    extension_id,
-    { request: "credentials" },
-    async function (response) {
-      console.log("API_KEY i getCredentials: " + response.API_KEY)
-      console.log("token i getCredentials: " + response.token)
-      await postEventInner(response)
-    }
-  )
+    chrome.runtime.sendMessage(
+        extension_id,
+        { request: "credentials" },
+        async function (response) {
+            console.log("API_KEY i getCredentials: " + response.API_KEY)
+            console.log("token i getCredentials: " + response.token)
+            await postEventInner(response, event)
+        }
+    )
 }
 
 // Poster event til brukers online-kalender
@@ -31,6 +34,7 @@ async function postEventInner(credentials) {
   chrome.storage.local.get(["online_calendar_id"], (result) => {
     const online_calendar_id = result.online_calendar_id
 
+    /* HTTP-header for å poste event */
     var init = {
       method: "POST",
       async: true,

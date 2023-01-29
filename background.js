@@ -96,9 +96,15 @@ async function doAuth() {
   })
 }
 
-//? Kjøres både når knappen i popup.html trykkes på,
-//? og når påmeldingsknappen på online trykkes på.
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+
+chrome.runtime.onMessage.addListener(
+  /* Handler alle incoming messages fra andre filer som
+   */
+  function (request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension")
+
   if (request.request === "oauth") {
     doAuth()
     return true
