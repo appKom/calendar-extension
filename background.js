@@ -33,7 +33,7 @@ async function addNewSecondaryCalendar(token) {
 }
 
 function check_if_calendar_exists(data, calendar_id) {
-  /*  */
+  /* Itererer over listen over kalendre for å se om extensionkalenderen finnes*/
 
   for (var i = 0; i < data.items.length; i++) {
     console.log(data.items[i].id)
