@@ -1,16 +1,19 @@
 // NOTE: Vurder å bruke chrome.storage.sync i stedet for chrome.storage.local
 
-async function addCalendarAndStoreCalendarId(token) {
-  console.log("token: " + token)
-  data = await addNewSecondaryCalendar(token)
-  calendarId = data.id
-  console.log("Fra autorisering, id: " + calendarId)
-  chrome.storage.local.set({ online_calendar_id: calendarId })
-  // localStorage.setItem("online_calendar_id", calendarId)
+async function addCalendarAndStoreCalendarId(token, API_KEY) {
+    console.log("token: " + token)
+    console.log("API_KEY: " + API_KEY)
+    addNewSecondaryCalendar(token, API_KEY).then((data) => {
+        console.log(data)
+    calendarId = data.id
+      console.log("Fra autorisering, id: " + calendarId)
+      chrome.storage.local.set({ online_calendar_id: calendarId })
+        // localStorage.setItem("online_calendar_id", calendarId)
+    })
 }
 
 // Returnerer id-en til opprettet kalender.
-async function addNewSecondaryCalendar(token) {
+async function addNewSecondaryCalendar(token, API_KEY) {
   // Returnerer id-en til opprettet kalender basert på token.
   console.log("Adding new secondary calendar")
   var init = {
@@ -97,7 +100,7 @@ async function doAuth() {
 
           if (!online_calendar_exists) {
             // CREATE NEW CALENDAR
-            addCalendarAndStoreCalendarId(token)
+            addCalendarAndStoreCalendarId(token, API_KEY)
           }
         })
     })
